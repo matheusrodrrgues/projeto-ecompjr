@@ -26,6 +26,11 @@ As rotas atuais usam o prefixo `/api/v1`:
 
 - `/categorias` para cadastrar, listar, consultar, atualizar e excluir categorias;
 - `/fornecedores` para cadastrar, listar, consultar, atualizar e excluir fornecedores.
+- `/produtos` para cadastrar, listar, filtrar, consultar, atualizar e excluir produtos;
+- `/produtos/estoque-baixo` para consultar produtos no estoque minimo ou abaixo dele.
+
+Produtos sao criados com estoque zero. A quantidade nao pode ser alterada pelo CRUD porque as
+entradas e saidas serao registradas pelas rotas de movimentacao de estoque.
 
 A documentacao interativa do FastAPI mostra os corpos e respostas esperados de cada rota.
 
