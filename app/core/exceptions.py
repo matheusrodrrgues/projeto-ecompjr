@@ -10,7 +10,7 @@ class RecursoNaoEncontradoErro(RegraDeNegocioErro):
     def __init__(self, recurso: str) -> None:
         super().__init__(
             codigo="RECURSO_NAO_ENCONTRADO",
-            mensagem=f"{recurso} nao encontrado.",
+            mensagem=f"Recurso nao encontrado: {recurso}.",
             status_code=404,
         )
 
