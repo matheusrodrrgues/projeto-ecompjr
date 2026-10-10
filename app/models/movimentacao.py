@@ -11,6 +11,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 if TYPE_CHECKING:
+    from app.models.fornecedor import Fornecedor
     from app.models.produto import Produto
 
 
@@ -29,6 +30,9 @@ class MovimentacaoEstoque(Base):
     produto_id: Mapped[int] = mapped_column(
         ForeignKey("produtos.id", ondelete="RESTRICT"), index=True
     )
+    fornecedor_id: Mapped[int] = mapped_column(
+        ForeignKey("fornecedores.id", ondelete="RESTRICT"), index=True
+    )
     tipo: Mapped[TipoMovimentacao] = mapped_column(
         SqlEnum(
             TipoMovimentacao,
@@ -41,3 +45,4 @@ class MovimentacaoEstoque(Base):
     data: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     produto: Mapped[Produto] = relationship(back_populates="movimentacoes")
+    fornecedor: Mapped[Fornecedor] = relationship(back_populates="movimentacoes")

@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 if TYPE_CHECKING:
+    from app.models.movimentacao import MovimentacaoEstoque
     from app.models.produto import Produto
 
 
@@ -23,3 +24,4 @@ class Fornecedor(Base):
     criado_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     produtos: Mapped[list[Produto]] = relationship(back_populates="fornecedor")
+    movimentacoes: Mapped[list[MovimentacaoEstoque]] = relationship(back_populates="fornecedor")
