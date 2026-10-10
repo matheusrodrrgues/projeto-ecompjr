@@ -103,7 +103,7 @@ ruff format --check .
 ruff check .
 ```
 
-Essas verificações também rodam no GitHub Actions a cada push ou pull request na branch `main`.
+Essas verificações também rodam no GitHub Actions a cada push ou pull request na branch `main`. O workflow inicia um PostgreSQL, aplica as migrations e testa duas saídas simultâneas para conferir o bloqueio do estoque.
 
 ## Algumas decisões
 
