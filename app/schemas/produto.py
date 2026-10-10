@@ -15,10 +15,10 @@ class ProdutoBase(BaseModel):
     categoria_id: int = Field(gt=0)
     fornecedor_id: int = Field(gt=0)
 
-    @field_validator("nome", "sku")
+    @field_validator("nome", "sku", mode="before")
     @classmethod
     def limpar_texto(cls, valor: str) -> str:
-        return valor.strip()
+        return valor.strip() if isinstance(valor, str) else valor
 
     @field_validator("sku")
     @classmethod
@@ -41,10 +41,10 @@ class ProdutoAtualizacao(BaseModel):
     categoria_id: int | None = Field(default=None, gt=0)
     fornecedor_id: int | None = Field(default=None, gt=0)
 
-    @field_validator("nome", "sku")
+    @field_validator("nome", "sku", mode="before")
     @classmethod
     def limpar_texto(cls, valor: str | None) -> str | None:
-        return valor.strip() if valor is not None else None
+        return valor.strip() if isinstance(valor, str) else valor
 
     @field_validator("sku")
     @classmethod

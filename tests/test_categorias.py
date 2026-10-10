@@ -31,3 +31,15 @@ async def test_nao_permite_categoria_duplicada(client: AsyncClient) -> None:
 
     assert resposta.status_code == 409
     assert resposta.json()["erro"]["codigo"] == "CATEGORIA_DUPLICADA"
+
+
+@pytest.mark.anyio
+async def test_rejeita_nome_vazio_e_campo_desconhecido(client: AsyncClient) -> None:
+    nome_vazio = await client.post("/api/v1/categorias", json={"nome": "   "})
+    campo_desconhecido = await client.post(
+        "/api/v1/categorias",
+        json={"nome": "Limpeza", "ativo": True},
+    )
+
+    assert nome_vazio.status_code == 422
+    assert campo_desconhecido.status_code == 422

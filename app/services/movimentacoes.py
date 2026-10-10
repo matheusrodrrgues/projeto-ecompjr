@@ -38,9 +38,6 @@ def criar_movimentacao(db: Session, dados: MovimentacaoCriacao) -> MovimentacaoE
         db.commit()
         db.refresh(movimentacao)
         return movimentacao
-    except RegraDeNegocioErro:
-        db.rollback()
-        raise
     except Exception:
         db.rollback()
         raise

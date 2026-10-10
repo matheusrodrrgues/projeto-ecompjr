@@ -5,15 +5,17 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, mo
 
 
 class FornecedorBase(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     nome: str = Field(min_length=2, max_length=150)
     cnpj: str
     telefone: str = Field(min_length=8, max_length=20)
     email: EmailStr
 
-    @field_validator("nome", "telefone")
+    @field_validator("nome", "telefone", mode="before")
     @classmethod
     def limpar_texto(cls, valor: str) -> str:
-        return valor.strip()
+        return valor.strip() if isinstance(valor, str) else valor
 
     @field_validator("cnpj", mode="before")
     @classmethod
@@ -29,15 +31,17 @@ class FornecedorCriacao(FornecedorBase):
 
 
 class FornecedorAtualizacao(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     nome: str | None = Field(default=None, min_length=2, max_length=150)
     cnpj: str | None = None
     telefone: str | None = Field(default=None, min_length=8, max_length=20)
     email: EmailStr | None = None
 
-    @field_validator("nome", "telefone")
+    @field_validator("nome", "telefone", mode="before")
     @classmethod
     def limpar_texto(cls, valor: str | None) -> str | None:
-        return valor.strip() if valor is not None else None
+        return valor.strip() if isinstance(valor, str) else valor
 
     @field_validator("cnpj", mode="before")
     @classmethod

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.movimentacao import TipoMovimentacao
 from app.schemas.movimentacao import MovimentacaoCriacao, MovimentacaoResposta
-from app.services import estoque as servico
+from app.services import movimentacoes as servico
 
 router = APIRouter(prefix="/movimentacoes", tags=["Movimentações de estoque"])
 SessaoBanco = Annotated[Session, Depends(get_db)]

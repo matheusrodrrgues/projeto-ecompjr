@@ -13,11 +13,13 @@ class MovimentacaoCriacao(BaseModel):
     quantidade: int = Field(gt=0)
     observacao: str | None = Field(default=None, max_length=500)
 
-    @field_validator("observacao")
+    @field_validator("observacao", mode="before")
     @classmethod
     def limpar_observacao(cls, observacao: str | None) -> str | None:
         if observacao is None:
             return None
+        if not isinstance(observacao, str):
+            return observacao
         observacao = observacao.strip()
         return observacao or None
 

@@ -85,6 +85,17 @@ async def test_nao_aceita_alteracao_direta_do_estoque(client: AsyncClient) -> No
 
 
 @pytest.mark.anyio
+async def test_nao_aceita_nome_em_branco(client: AsyncClient) -> None:
+    categoria_id, fornecedor_id = await criar_relacionamentos(client)
+    dados = dados_produto(categoria_id, fornecedor_id)
+    dados["nome"] = "   "
+
+    resposta = await client.post("/api/v1/produtos", json=dados)
+
+    assert resposta.status_code == 422
+
+
+@pytest.mark.anyio
 async def test_lista_produtos_com_estoque_baixo_e_filtros(client: AsyncClient) -> None:
     categoria_id, fornecedor_id = await criar_relacionamentos(client)
     await client.post("/api/v1/produtos", json=dados_produto(categoria_id, fornecedor_id))

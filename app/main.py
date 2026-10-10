@@ -45,7 +45,11 @@ async def tratar_erro_de_validacao(request: Request, erro: RequestValidationErro
 
 @app.exception_handler(StarletteHTTPException)
 async def tratar_erro_http(request: Request, erro: StarletteHTTPException) -> JSONResponse:
-    mensagem = "Rota não encontrada." if erro.status_code == 404 else str(erro.detail)
+    mensagens = {
+        404: "Rota não encontrada.",
+        405: "Método não permitido.",
+    }
+    mensagem = mensagens.get(erro.status_code, str(erro.detail))
     return JSONResponse(
         status_code=erro.status_code,
         content={"erro": {"codigo": "ERRO_HTTP", "mensagem": mensagem}},

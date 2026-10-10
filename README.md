@@ -18,7 +18,7 @@ Tenha Docker e Docker Compose instalados. Depois, na pasta do projeto:
 
 ```bash
 cp .env.example .env
-docker compose up --build
+docker compose up --build -d
 docker compose exec api alembic upgrade head
 ```
 
@@ -27,6 +27,17 @@ A API fica em `http://localhost:8000`. Os links mais úteis são:
 - Swagger: `http://localhost:8000/docs`
 - OpenAPI: `http://localhost:8000/openapi.json`
 - saúde da API: `GET http://localhost:8000/health`
+
+Para encerrar os containers, use `docker compose down`.
+
+## Organização do projeto
+
+- `app/api/routes`: recebe as requisições e chama os services;
+- `app/models`: representa as tabelas e os relacionamentos do banco;
+- `app/schemas`: valida os dados de entrada e define as respostas;
+- `app/services`: concentra as consultas e regras de negócio;
+- `alembic`: guarda o histórico de alterações do banco;
+- `tests`: reúne os testes automatizados da API.
 
 ## Regras de estoque
 
@@ -104,5 +115,5 @@ Essas verificações também rodam no GitHub Actions a cada push ou pull request
 
 ## Uso de IA
 
-IA foi usada como apoio para organizar a estrutura, revisar regras e investigar erros. O código foi ajustado ao enunciado e cada decisão importante ficou registrada neste README.
+Usei IA como apoio na estrutura inicial, na revisão das validações e na criação de alguns testes. As sugestões foram revisadas durante o desenvolvimento: os nomes do domínio foram mantidos em português, as mensagens de erro foram padronizadas e as regras de estoque ficaram separadas das rotas. Também revisei a atualização do saldo, o bloqueio usado nas movimentações e a preservação do histórico antes de manter essas partes no projeto.
 

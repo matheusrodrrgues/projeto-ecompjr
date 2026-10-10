@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.core.exceptions import ConflitoErro, RecursoNaoEncontradoErro
 from app.models.fornecedor import Fornecedor
+from app.models.movimentacao import MovimentacaoEstoque
 from app.models.produto import Produto
 from app.schemas.fornecedor import FornecedorAtualizacao, FornecedorCriacao
 
@@ -103,6 +104,17 @@ def excluir_fornecedor(db: Session, fornecedor_id: int) -> None:
         raise ConflitoErro(
             "FORNECEDOR_EM_USO",
             "O fornecedor possui produtos vinculados e não pode ser excluído.",
+        )
+
+    movimentacao = db.scalar(
+        select(MovimentacaoEstoque.id)
+        .where(MovimentacaoEstoque.fornecedor_id == fornecedor_id)
+        .limit(1)
+    )
+    if movimentacao is not None:
+        raise ConflitoErro(
+            "FORNECEDOR_COM_HISTORICO",
+            "O fornecedor possui movimentações registradas e não pode ser excluído.",
         )
 
     db.delete(fornecedor)

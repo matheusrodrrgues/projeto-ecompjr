@@ -122,6 +122,7 @@ async def test_movimentacao_nao_pode_ser_alterada_ou_excluida(client: AsyncClien
     exclusao = await client.delete(f"/api/v1/movimentacoes/{movimentacao_id}")
 
     assert alteracao.status_code == 405
+    assert alteracao.json()["erro"]["mensagem"] == "Método não permitido."
     assert exclusao.status_code == 405
 
 
@@ -137,3 +138,30 @@ async def test_produto_com_movimentacao_nao_pode_ser_excluido(client: AsyncClien
 
     assert resposta.status_code == 409
     assert resposta.json()["erro"]["codigo"] == "PRODUTO_COM_HISTORICO"
+
+
+@pytest.mark.anyio
+async def test_fornecedor_do_historico_nao_pode_ser_excluido(client: AsyncClient) -> None:
+    produto_id, fornecedor_antigo_id = await criar_produto(client)
+    await client.post(
+        "/api/v1/movimentacoes",
+        json={"produto_id": produto_id, "tipo": "entrada", "quantidade": 5},
+    )
+    novo_fornecedor = await client.post(
+        "/api/v1/fornecedores",
+        json={
+            "nome": "Novo Atacado",
+            "cnpj": "98.765.432/0001-10",
+            "telefone": "7533334444",
+            "email": "contato@novoatacado.com.br",
+        },
+    )
+    await client.patch(
+        f"/api/v1/produtos/{produto_id}",
+        json={"fornecedor_id": novo_fornecedor.json()["id"]},
+    )
+
+    resposta = await client.delete(f"/api/v1/fornecedores/{fornecedor_antigo_id}")
+
+    assert resposta.status_code == 409
+    assert resposta.json()["erro"]["codigo"] == "FORNECEDOR_COM_HISTORICO"

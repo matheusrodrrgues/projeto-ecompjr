@@ -4,12 +4,14 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 
 class CategoriaBase(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     nome: str = Field(min_length=2, max_length=100)
 
-    @field_validator("nome")
+    @field_validator("nome", mode="before")
     @classmethod
     def limpar_nome(cls, nome: str) -> str:
-        return nome.strip()
+        return nome.strip() if isinstance(nome, str) else nome
 
 
 class CategoriaCriacao(CategoriaBase):
@@ -17,12 +19,14 @@ class CategoriaCriacao(CategoriaBase):
 
 
 class CategoriaAtualizacao(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     nome: str | None = Field(default=None, min_length=2, max_length=100)
 
-    @field_validator("nome")
+    @field_validator("nome", mode="before")
     @classmethod
     def limpar_nome(cls, nome: str | None) -> str | None:
-        return nome.strip() if nome is not None else None
+        return nome.strip() if isinstance(nome, str) else nome
 
     @model_validator(mode="after")
     def validar_alteracao(self) -> "CategoriaAtualizacao":

@@ -47,3 +47,11 @@ async def test_valida_formato_do_cnpj(client: AsyncClient) -> None:
 
     assert resposta.status_code == 422
     assert resposta.json()["erro"]["codigo"] == "DADOS_INVALIDOS"
+
+
+@pytest.mark.anyio
+async def test_rejeita_campo_desconhecido(client: AsyncClient) -> None:
+    dados = {**DADOS_FORNECEDOR, "site": "https://exemplo.com"}
+    resposta = await client.post("/api/v1/fornecedores", json=dados)
+
+    assert resposta.status_code == 422
