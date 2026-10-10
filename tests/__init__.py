@@ -1,2 +1,1 @@
 """Testes automatizados da aplicacao."""
-

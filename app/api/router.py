@@ -7,4 +7,3 @@ api_router.include_router(categorias.router)
 api_router.include_router(fornecedores.router)
 api_router.include_router(produtos.router)
 api_router.include_router(movimentacoes.router)
-
