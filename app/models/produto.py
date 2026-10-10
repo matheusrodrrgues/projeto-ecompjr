@@ -1,10 +1,18 @@
+from __future__ import annotations
+
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.categoria import Categoria
+    from app.models.fornecedor import Fornecedor
+    from app.models.movimentacao import MovimentacaoEstoque
 
 
 class Produto(Base):
@@ -31,16 +39,11 @@ class Produto(Base):
     fornecedor_id: Mapped[int] = mapped_column(
         ForeignKey("fornecedores.id", ondelete="RESTRICT"), index=True
     )
-    criado_em: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    criado_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     atualizado_em: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
-    categoria: Mapped["Categoria"] = relationship(back_populates="produtos")
-    fornecedor: Mapped["Fornecedor"] = relationship(back_populates="produtos")
-    movimentacoes: Mapped[list["MovimentacaoEstoque"]] = relationship(
-        back_populates="produto"
-    )
-
+    categoria: Mapped[Categoria] = relationship(back_populates="produtos")
+    fornecedor: Mapped[Fornecedor] = relationship(back_populates="produtos")
+    movimentacoes: Mapped[list[MovimentacaoEstoque]] = relationship(back_populates="produto")
