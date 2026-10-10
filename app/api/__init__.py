@@ -1,1 +1,1 @@
-"""Camada HTTP da aplicacao."""
+"""Camada HTTP da aplicação."""

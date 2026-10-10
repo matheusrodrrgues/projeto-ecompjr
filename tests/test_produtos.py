@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 
 async def criar_relacionamentos(client: AsyncClient) -> tuple[int, int]:
-    categoria = await client.post("/api/v1/categorias", json={"nome": "Eletronicos"})
+    categoria = await client.post("/api/v1/categorias", json={"nome": "Eletrônicos"})
     fornecedor = await client.post(
         "/api/v1/fornecedores",
         json={
@@ -20,7 +20,7 @@ async def criar_relacionamentos(client: AsyncClient) -> tuple[int, int]:
 
 def dados_produto(categoria_id: int, fornecedor_id: int) -> dict:
     return {
-        "nome": "Teclado Mecanico",
+        "nome": "Teclado Mecânico",
         "sku": "tec-001",
         "preco_custo": "120.00",
         "preco_venda": "199.90",
@@ -70,7 +70,7 @@ async def test_exige_categoria_e_fornecedor_existentes(client: AsyncClient) -> N
     resposta = await client.post("/api/v1/produtos", json=dados)
 
     assert resposta.status_code == 404
-    assert resposta.json()["erro"]["mensagem"] == "Recurso nao encontrado: Categoria."
+    assert resposta.json()["erro"]["mensagem"] == "Recurso não encontrado: Categoria."
 
 
 @pytest.mark.anyio

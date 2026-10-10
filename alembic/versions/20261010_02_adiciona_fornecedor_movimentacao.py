@@ -1,4 +1,4 @@
-"""Guarda o fornecedor no historico de movimentacoes.
+"""Guarda o fornecedor no histórico de movimentações.
 
 Revision ID: 20261010_02
 Revises: 20261010_01
@@ -23,7 +23,7 @@ def upgrade() -> None:
         sa.Column("fornecedor_id", sa.Integer(), nullable=True),
     )
 
-    # Copia o fornecedor atual para preservar qualquer movimentacao que ja exista.
+    # Copia o fornecedor atual para preservar qualquer movimentação que já exista.
     op.execute(
         sa.text(
             """

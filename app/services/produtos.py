@@ -22,7 +22,7 @@ def _verificar_sku(db: Session, sku: str, ignorar_produto_id: int | None = None)
     if ignorar_produto_id is not None:
         consulta = consulta.where(Produto.id != ignorar_produto_id)
     if db.scalar(consulta) is not None:
-        raise ConflitoErro("SKU_DUPLICADO", "Ja existe um produto com esse SKU.")
+        raise ConflitoErro("SKU_DUPLICADO", "Já existe um produto com esse SKU.")
 
 
 def criar_produto(db: Session, dados: ProdutoCriacao) -> Produto:
@@ -36,7 +36,7 @@ def criar_produto(db: Session, dados: ProdutoCriacao) -> Produto:
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise ConflitoErro("PRODUTO_INVALIDO", "Nao foi possivel cadastrar o produto.") from None
+        raise ConflitoErro("PRODUTO_INVALIDO", "Não foi possível cadastrar o produto.") from None
 
     db.refresh(produto)
     return produto
@@ -98,7 +98,7 @@ def atualizar_produto(db: Session, produto_id: int, dados: ProdutoAtualizacao) -
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise ConflitoErro("PRODUTO_INVALIDO", "Nao foi possivel atualizar o produto.") from None
+        raise ConflitoErro("PRODUTO_INVALIDO", "Não foi possível atualizar o produto.") from None
 
     db.refresh(produto)
     return produto
@@ -112,7 +112,7 @@ def excluir_produto(db: Session, produto_id: int) -> None:
     if movimentacao is not None:
         raise ConflitoErro(
             "PRODUTO_COM_HISTORICO",
-            "O produto possui movimentacoes e nao pode ser excluido.",
+            "O produto possui movimentações e não pode ser excluído.",
         )
 
     db.delete(produto)

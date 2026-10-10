@@ -27,8 +27,8 @@ def _verificar_duplicidade(
     if existente is None:
         return
     if cnpj is not None and existente.cnpj == cnpj:
-        raise ConflitoErro("CNPJ_DUPLICADO", "Ja existe um fornecedor com esse CNPJ.")
-    raise ConflitoErro("EMAIL_DUPLICADO", "Ja existe um fornecedor com esse e-mail.")
+        raise ConflitoErro("CNPJ_DUPLICADO", "Já existe um fornecedor com esse CNPJ.")
+    raise ConflitoErro("EMAIL_DUPLICADO", "Já existe um fornecedor com esse e-mail.")
 
 
 def criar_fornecedor(db: Session, dados: FornecedorCriacao) -> Fornecedor:
@@ -45,7 +45,7 @@ def criar_fornecedor(db: Session, dados: FornecedorCriacao) -> Fornecedor:
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise ConflitoErro("FORNECEDOR_DUPLICADO", "CNPJ ou e-mail ja cadastrado.") from None
+        raise ConflitoErro("FORNECEDOR_DUPLICADO", "CNPJ ou e-mail já cadastrado.") from None
 
     db.refresh(fornecedor)
     return fornecedor
@@ -88,7 +88,7 @@ def atualizar_fornecedor(
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise ConflitoErro("FORNECEDOR_DUPLICADO", "CNPJ ou e-mail ja cadastrado.") from None
+        raise ConflitoErro("FORNECEDOR_DUPLICADO", "CNPJ ou e-mail já cadastrado.") from None
 
     db.refresh(fornecedor)
     return fornecedor
@@ -102,7 +102,7 @@ def excluir_fornecedor(db: Session, fornecedor_id: int) -> None:
     if produto_vinculado is not None:
         raise ConflitoErro(
             "FORNECEDOR_EM_USO",
-            "O fornecedor possui produtos vinculados e nao pode ser excluido.",
+            "O fornecedor possui produtos vinculados e não pode ser excluído.",
         )
 
     db.delete(fornecedor)

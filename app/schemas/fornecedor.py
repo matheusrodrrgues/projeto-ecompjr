@@ -20,7 +20,7 @@ class FornecedorBase(BaseModel):
     def normalizar_cnpj(cls, cnpj: str) -> str:
         apenas_numeros = re.sub(r"\D", "", cnpj)
         if len(apenas_numeros) != 14:
-            raise ValueError("O CNPJ deve ter 14 digitos.")
+            raise ValueError("O CNPJ deve ter 14 dígitos.")
         return apenas_numeros
 
 
@@ -46,7 +46,7 @@ class FornecedorAtualizacao(BaseModel):
             return None
         apenas_numeros = re.sub(r"\D", "", cnpj)
         if len(apenas_numeros) != 14:
-            raise ValueError("O CNPJ deve ter 14 digitos.")
+            raise ValueError("O CNPJ deve ter 14 dígitos.")
         return apenas_numeros
 
     @model_validator(mode="after")
@@ -54,7 +54,7 @@ class FornecedorAtualizacao(BaseModel):
         if not self.model_fields_set:
             raise ValueError("Informe ao menos um campo para atualizar.")
         if any(getattr(self, campo) is None for campo in self.model_fields_set):
-            raise ValueError("Os campos informados nao podem ser nulos.")
+            raise ValueError("Os campos informados não podem ser nulos.")
         return self
 
 

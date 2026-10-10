@@ -9,7 +9,7 @@ from app.models.movimentacao import TipoMovimentacao
 from app.schemas.movimentacao import MovimentacaoCriacao, MovimentacaoResposta
 from app.services import estoque as servico
 
-router = APIRouter(prefix="/movimentacoes", tags=["Movimentacoes de estoque"])
+router = APIRouter(prefix="/movimentacoes", tags=["Movimentações de estoque"])
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 

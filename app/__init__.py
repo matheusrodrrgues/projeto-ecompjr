@@ -1,1 +1,1 @@
-"""Aplicacao principal da API de estoque."""
+"""Aplicação principal da API de estoque."""

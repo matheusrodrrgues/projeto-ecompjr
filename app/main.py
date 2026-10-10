@@ -45,7 +45,7 @@ async def tratar_erro_de_validacao(request: Request, erro: RequestValidationErro
 
 @app.exception_handler(StarletteHTTPException)
 async def tratar_erro_http(request: Request, erro: StarletteHTTPException) -> JSONResponse:
-    mensagem = "Rota nao encontrada." if erro.status_code == 404 else str(erro.detail)
+    mensagem = "Rota não encontrada." if erro.status_code == 404 else str(erro.detail)
     return JSONResponse(
         status_code=erro.status_code,
         content={"erro": {"codigo": "ERRO_HTTP", "mensagem": mensagem}},
@@ -54,7 +54,7 @@ async def tratar_erro_http(request: Request, erro: StarletteHTTPException) -> JS
 
 @app.exception_handler(Exception)
 async def tratar_erro_inesperado(request: Request, erro: Exception) -> JSONResponse:
-    logger.exception("Erro inesperado durante a requisicao", exc_info=erro)
+    logger.exception("Erro inesperado durante a requisição", exc_info=erro)
     return JSONResponse(
         status_code=500,
         content={
@@ -66,6 +66,6 @@ async def tratar_erro_inesperado(request: Request, erro: Exception) -> JSONRespo
     )
 
 
-@app.get("/health", tags=["Saude"])
+@app.get("/health", tags=["Saúde"])
 async def health_check() -> dict[str, str]:
     return {"status": "ok"}

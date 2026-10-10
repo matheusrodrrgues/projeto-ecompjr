@@ -16,11 +16,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - name: Instalar dependencias
+      - name: Instalar dependências
         run: pip install -e ".[dev]"
-      - name: Conferir formatacao
+      - name: Conferir formatação
         run: ruff format --check .
-      - name: Conferir codigo
+      - name: Conferir código
         run: ruff check .
       - name: Rodar testes
         run: pytest -q

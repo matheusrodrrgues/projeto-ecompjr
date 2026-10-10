@@ -11,7 +11,7 @@ from app.schemas.categoria import CategoriaAtualizacao, CategoriaCriacao
 def criar_categoria(db: Session, dados: CategoriaCriacao) -> Categoria:
     existente = db.scalar(select(Categoria).where(Categoria.nome == dados.nome))
     if existente:
-        raise ConflitoErro("CATEGORIA_DUPLICADA", "Ja existe uma categoria com esse nome.")
+        raise ConflitoErro("CATEGORIA_DUPLICADA", "Já existe uma categoria com esse nome.")
 
     categoria = Categoria(nome=dados.nome)
     db.add(categoria)
@@ -21,7 +21,7 @@ def criar_categoria(db: Session, dados: CategoriaCriacao) -> Categoria:
     except IntegrityError:
         db.rollback()
         raise ConflitoErro(
-            "CATEGORIA_DUPLICADA", "Ja existe uma categoria com esse nome."
+            "CATEGORIA_DUPLICADA", "Já existe uma categoria com esse nome."
         ) from None
 
     db.refresh(categoria)
@@ -51,7 +51,7 @@ def atualizar_categoria(db: Session, categoria_id: int, dados: CategoriaAtualiza
             )
         )
         if existente:
-            raise ConflitoErro("CATEGORIA_DUPLICADA", "Ja existe uma categoria com esse nome.")
+            raise ConflitoErro("CATEGORIA_DUPLICADA", "Já existe uma categoria com esse nome.")
         categoria.nome = alteracoes["nome"]
 
     try:
@@ -59,7 +59,7 @@ def atualizar_categoria(db: Session, categoria_id: int, dados: CategoriaAtualiza
     except IntegrityError:
         db.rollback()
         raise ConflitoErro(
-            "CATEGORIA_DUPLICADA", "Ja existe uma categoria com esse nome."
+            "CATEGORIA_DUPLICADA", "Já existe uma categoria com esse nome."
         ) from None
 
     db.refresh(categoria)
@@ -73,7 +73,7 @@ def excluir_categoria(db: Session, categoria_id: int) -> None:
     )
     if produto_vinculado is not None:
         raise ConflitoErro(
-            "CATEGORIA_EM_USO", "A categoria possui produtos vinculados e nao pode ser excluida."
+            "CATEGORIA_EM_USO", "A categoria possui produtos vinculados e não pode ser excluída."
         )
 
     db.delete(categoria)

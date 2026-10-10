@@ -1,1 +1,1 @@
-"""Configuracoes e recursos compartilhados da aplicacao."""
+"""Configurações e recursos compartilhados da aplicação."""

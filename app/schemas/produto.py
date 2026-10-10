@@ -56,7 +56,7 @@ class ProdutoAtualizacao(BaseModel):
         if not self.model_fields_set:
             raise ValueError("Informe ao menos um campo para atualizar.")
         if any(getattr(self, campo) is None for campo in self.model_fields_set):
-            raise ValueError("Os campos informados nao podem ser nulos.")
+            raise ValueError("Os campos informados não podem ser nulos.")
         return self
 
 

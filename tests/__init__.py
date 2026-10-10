@@ -1,1 +1,1 @@
-"""Testes automatizados da aplicacao."""
+"""Testes automatizados da aplicação."""

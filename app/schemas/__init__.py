@@ -1,1 +1,1 @@
-"""Contratos de entrada e saida da API."""
+"""Contratos de entrada e saída da API."""

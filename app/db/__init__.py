@@ -1,1 +1,1 @@
-"""Configuracao e acesso ao banco de dados."""
+"""Configuração e acesso ao banco de dados."""

@@ -1,1 +1,1 @@
-"""Regras de negocio da aplicacao."""
+"""Regras de negócio da aplicação."""

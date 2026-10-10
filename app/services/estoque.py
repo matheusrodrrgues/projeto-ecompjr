@@ -11,7 +11,7 @@ from app.schemas.movimentacao import MovimentacaoCriacao
 
 def criar_movimentacao(db: Session, dados: MovimentacaoCriacao) -> MovimentacaoEstoque:
     try:
-        # O bloqueio impede duas saidas simultaneas de usarem o mesmo saldo.
+        # O bloqueio impede duas saídas simultâneas de usarem o mesmo saldo.
         produto = db.scalar(select(Produto).where(Produto.id == dados.produto_id).with_for_update())
         if produto is None:
             raise RecursoNaoEncontradoErro("Produto")
@@ -19,7 +19,7 @@ def criar_movimentacao(db: Session, dados: MovimentacaoCriacao) -> MovimentacaoE
         if dados.tipo == TipoMovimentacao.SAIDA and produto.quantidade_estoque < dados.quantidade:
             raise ConflitoErro(
                 "ESTOQUE_INSUFICIENTE",
-                "O produto nao possui estoque suficiente para essa saida.",
+                "O produto não possui estoque suficiente para essa saída.",
             )
 
         if dados.tipo == TipoMovimentacao.ENTRADA:
@@ -59,7 +59,7 @@ def listar_movimentacoes(
     if data_inicio and data_fim and data_inicio > data_fim:
         raise RegraDeNegocioErro(
             "PERIODO_INVALIDO",
-            "A data inicial nao pode ser posterior a data final.",
+            "A data inicial não pode ser posterior à data final.",
         )
 
     consulta = select(MovimentacaoEstoque)
@@ -87,5 +87,5 @@ def listar_movimentacoes(
 def buscar_movimentacao(db: Session, movimentacao_id: int) -> MovimentacaoEstoque:
     movimentacao = db.get(MovimentacaoEstoque, movimentacao_id)
     if movimentacao is None:
-        raise RecursoNaoEncontradoErro("Movimentacao")
+        raise RecursoNaoEncontradoErro("Movimentação")
     return movimentacao
