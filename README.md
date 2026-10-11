@@ -9,6 +9,8 @@ API para controlar produtos, fornecedores, categorias e entradas e saídas de es
 - consulta dos produtos com estoque baixo;
 - registro de entrada e saída com atualização automática do saldo;
 - histórico de movimentações com filtros por período, fornecedor, produto e tipo;
+- cadastro e login de usuários com autenticação JWT;
+- proteção das rotas que alteram os dados;
 - erros no mesmo formato em toda a API;
 - migrações do banco e testes automatizados.
 
@@ -39,6 +41,30 @@ Para encerrar os containers, use `docker compose down`.
 - `alembic`: guarda o histórico de alterações do banco;
 - `tests`: reúne os testes automatizados da API.
 
+## Autenticação
+
+As consultas são públicas. Para cadastrar, alterar ou excluir dados e registrar movimentações, é preciso estar autenticado.
+
+Primeiro, crie um usuário em `POST /api/v1/auth/cadastro`:
+
+```json
+{
+  "nome": "Matheus Rodrigues",
+  "email": "matheus@example.com",
+  "senha": "senha-segura-123"
+}
+```
+
+Depois, faça login em `POST /api/v1/auth/login`. Essa rota recebe dados de formulário: informe o e-mail no campo `username` e a senha no campo `password`. A resposta contém o token JWT.
+
+No Swagger, clique em **Authorize** e use o mesmo e-mail e senha. Fora do Swagger, envie o token no cabeçalho `Authorization`:
+
+```text
+Authorization: Bearer seu-token
+```
+
+A senha nunca é devolvida pela API e é salva no banco somente depois de passar pelo hash Argon2. A chave usada para assinar os tokens fica na variável `JWT_SECRET` do arquivo `.env` e deve ter pelo menos 32 caracteres.
+
 ## Regras de estoque
 
 Todo produto começa com estoque zero. O saldo não pode ser editado pela rota de produtos: ele só muda quando uma movimentação é registrada.
@@ -53,6 +79,8 @@ Todas as rotas de negócio usam o prefixo `/api/v1`.
 
 | Método | Caminho | Uso |
 | --- | --- | --- |
+| POST | `/auth/cadastro` | cadastrar um usuário |
+| POST | `/auth/login` | entrar e receber um token JWT |
 | POST, GET | `/categorias` | cadastrar e listar categorias |
 | GET, PATCH, DELETE | `/categorias/{id}` | consultar, atualizar e excluir uma categoria |
 | POST, GET | `/fornecedores` | cadastrar e listar fornecedores |
@@ -91,7 +119,7 @@ Os erros seguem este formato:
 }
 ```
 
-Os principais status usados são `400` para regra inválida, `404` para recurso não encontrado, `409` para conflito e `422` para campos inválidos.
+Os principais status usados são `400` para regra inválida, `401` para autenticação ausente ou inválida, `404` para recurso não encontrado, `409` para conflito e `422` para campos inválidos.
 
 ## Testes e qualidade
 
@@ -110,6 +138,7 @@ Essas verificações também rodam no GitHub Actions a cada push ou pull request
 - FastAPI foi usado pela validação dos dados e pela documentação Swagger pronta.
 - SQLAlchemy concentra o acesso ao banco e Alembic controla as mudanças da estrutura.
 - As regras ficam nos services para não misturar acesso ao banco com as rotas HTTP.
+- Senhas usam hash Argon2 e os tokens JWT expiram após o tempo definido no `.env`.
 - Valores de dinheiro usam `Decimal` no lugar de `float`.
 - Exclusões que quebrariam o histórico são recusadas.
 
