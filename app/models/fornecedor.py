@@ -1,3 +1,5 @@
+"""Tabela de fornecedores da loja."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -14,6 +16,8 @@ if TYPE_CHECKING:
 
 
 class Fornecedor(Base):
+    """Fornecedor identificado por CNPJ e e-mail únicos."""
+
     __tablename__ = "fornecedores"
 
     id: Mapped[int] = mapped_column(primary_key=True)

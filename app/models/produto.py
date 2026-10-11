@@ -1,3 +1,5 @@
+"""Tabela de produtos e seus vínculos com categoria e fornecedor."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -16,6 +18,8 @@ if TYPE_CHECKING:
 
 
 class Produto(Base):
+    """Produto do catálogo com saldo controlado por movimentações."""
+
     __tablename__ = "produtos"
     __table_args__ = (
         CheckConstraint("preco_custo >= 0", name="ck_produto_preco_custo_nao_negativo"),

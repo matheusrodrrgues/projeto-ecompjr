@@ -1,3 +1,5 @@
+"""Endpoints do catálogo e das consultas de estoque baixo."""
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Response, status
@@ -10,6 +12,7 @@ from app.schemas.produto import ProdutoAtualizacao, ProdutoCriacao, ProdutoRespo
 from app.services import produtos as servico
 
 router = APIRouter(prefix="/produtos", tags=["Produtos"], responses=RESPOSTAS_COMUNS)
+# Ao encontrar SessaoBanco, o FastAPI chama get_db e injeta a sessão na rota.
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 
@@ -22,6 +25,8 @@ SessaoBanco = Annotated[Session, Depends(get_db)]
     responses=respostas(401, 404, 409),
 )
 def criar(dados: ProdutoCriacao, db: SessaoBanco) -> ProdutoResposta:
+    """Confere categoria, fornecedor e SKU antes de criar o produto com saldo zero."""
+
     return servico.criar_produto(db, dados)
 
 
@@ -34,6 +39,8 @@ def listar(
     categoria_id: Annotated[int | None, Query(gt=0)] = None,
     fornecedor_id: Annotated[int | None, Query(gt=0)] = None,
 ) -> list[ProdutoResposta]:
+    """Busca produtos por nome, categoria ou fornecedor e aplica a paginação."""
+
     return servico.listar_produtos(
         db,
         offset=offset,
@@ -54,6 +61,8 @@ def listar_estoque_baixo(
     offset: Annotated[int, Query(ge=0)] = 0,
     limite: Annotated[int, Query(ge=1, le=100)] = 20,
 ) -> list[ProdutoResposta]:
+    """Lista produtos cujo saldo atual está abaixo ou igual ao estoque mínimo."""
+
     return servico.listar_estoque_baixo(db, offset, limite)
 
 
@@ -64,6 +73,8 @@ def listar_estoque_baixo(
     responses=respostas(404),
 )
 def buscar(produto_id: int, db: SessaoBanco) -> ProdutoResposta:
+    """Chama ``buscar_produto``; o service devolve o registro ou um erro 404."""
+
     return servico.buscar_produto(db, produto_id)
 
 
@@ -75,6 +86,8 @@ def buscar(produto_id: int, db: SessaoBanco) -> ProdutoResposta:
     responses=respostas(401, 404, 409),
 )
 def atualizar(produto_id: int, dados: ProdutoAtualizacao, db: SessaoBanco) -> ProdutoResposta:
+    """Atualiza somente os campos enviados, mas nunca altera o saldo por esta rota."""
+
     return servico.atualizar_produto(db, produto_id, dados)
 
 
@@ -86,5 +99,7 @@ def atualizar(produto_id: int, dados: ProdutoAtualizacao, db: SessaoBanco) -> Pr
     responses=respostas(401, 404, 409),
 )
 def excluir(produto_id: int, db: SessaoBanco) -> Response:
+    """Exclui somente produtos sem movimentação, preservando o histórico de estoque."""
+
     servico.excluir_produto(db, produto_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

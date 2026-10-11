@@ -1,3 +1,5 @@
+"""Tabela de categorias usadas para classificar os produtos."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -13,6 +15,8 @@ if TYPE_CHECKING:
 
 
 class Categoria(Base):
+    """Categoria com nome único e lista de produtos relacionados."""
+
     __tablename__ = "categorias"
 
     id: Mapped[int] = mapped_column(primary_key=True)

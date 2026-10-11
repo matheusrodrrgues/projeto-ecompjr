@@ -1,3 +1,5 @@
+"""Regras de cadastro, pesquisa e manutenção de produtos."""
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -11,6 +13,8 @@ from app.schemas.produto import ProdutoAtualizacao, ProdutoCriacao
 
 
 def _verificar_relacionamentos(db: Session, categoria_id: int, fornecedor_id: int) -> None:
+    """Confirma que as chaves estrangeiras recebidas apontam para registros reais."""
+
     if db.get(Categoria, categoria_id) is None:
         raise RecursoNaoEncontradoErro("Categoria")
     if db.get(Fornecedor, fornecedor_id) is None:
@@ -18,6 +22,8 @@ def _verificar_relacionamentos(db: Session, categoria_id: int, fornecedor_id: in
 
 
 def _verificar_sku(db: Session, sku: str, ignorar_produto_id: int | None = None) -> None:
+    """Procura outro produto com o SKU e permite ignorar o item em edição."""
+
     consulta = select(Produto).where(Produto.sku == sku)
     if ignorar_produto_id is not None:
         consulta = consulta.where(Produto.id != ignorar_produto_id)
@@ -26,6 +32,12 @@ def _verificar_sku(db: Session, sku: str, ignorar_produto_id: int | None = None)
 
 
 def criar_produto(db: Session, dados: ProdutoCriacao) -> Produto:
+    """Valida categoria, fornecedor e SKU antes de inserir o produto.
+
+    A quantidade começa em zero de propósito, pois alterações de saldo precisam
+    passar pelo service de movimentações e deixar um registro no histórico.
+    """
+
     _verificar_relacionamentos(db, dados.categoria_id, dados.fornecedor_id)
     _verificar_sku(db, dados.sku)
 
@@ -50,6 +62,8 @@ def listar_produtos(
     categoria_id: int | None = None,
     fornecedor_id: int | None = None,
 ) -> list[Produto]:
+    """Monta a busca por nome, categoria e fornecedor e aplica a paginação."""
+
     consulta = select(Produto)
     if nome:
         consulta = consulta.where(Produto.nome.ilike(f"%{nome.strip()}%"))
@@ -63,6 +77,8 @@ def listar_produtos(
 
 
 def listar_estoque_baixo(db: Session, offset: int, limite: int) -> list[Produto]:
+    """Compara duas colunas no banco e devolve saldo menor ou igual ao mínimo."""
+
     consulta = (
         select(Produto)
         .where(Produto.quantidade_estoque <= Produto.estoque_minimo)
@@ -74,6 +90,8 @@ def listar_estoque_baixo(db: Session, offset: int, limite: int) -> list[Produto]
 
 
 def buscar_produto(db: Session, produto_id: int) -> Produto:
+    """Usa a chave primária para buscar o produto ou gera um erro 404."""
+
     produto = db.get(Produto, produto_id)
     if produto is None:
         raise RecursoNaoEncontradoErro("Produto")
@@ -81,6 +99,12 @@ def buscar_produto(db: Session, produto_id: int) -> Produto:
 
 
 def atualizar_produto(db: Session, produto_id: int, dados: ProdutoAtualizacao) -> Produto:
+    """Aplica somente os campos enviados depois de validar vínculos e SKU.
+
+    ``exclude_unset`` diferencia um campo não enviado de um valor padrão. O
+    schema não possui quantidade de estoque, então o saldo não muda por aqui.
+    """
+
     produto = buscar_produto(db, produto_id)
     alteracoes = dados.model_dump(exclude_unset=True)
 
@@ -105,6 +129,8 @@ def atualizar_produto(db: Session, produto_id: int, dados: ProdutoAtualizacao) -
 
 
 def excluir_produto(db: Session, produto_id: int) -> None:
+    """Procura movimentações antes de excluir para preservar a auditoria."""
+
     produto = buscar_produto(db, produto_id)
     movimentacao = db.scalar(
         select(MovimentacaoEstoque.id).where(MovimentacaoEstoque.produto_id == produto_id).limit(1)

@@ -1,3 +1,5 @@
+"""Regras de cadastro, consulta e exclusão de categorias."""
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -9,6 +11,8 @@ from app.schemas.categoria import CategoriaAtualizacao, CategoriaCriacao
 
 
 def criar_categoria(db: Session, dados: CategoriaCriacao) -> Categoria:
+    """Procura o nome, insere a categoria e devolve os dados gerados pelo banco."""
+
     existente = db.scalar(select(Categoria).where(Categoria.nome == dados.nome))
     if existente:
         raise ConflitoErro("CATEGORIA_DUPLICADA", "Já existe uma categoria com esse nome.")
@@ -19,6 +23,7 @@ def criar_categoria(db: Session, dados: CategoriaCriacao) -> Categoria:
     try:
         db.commit()
     except IntegrityError:
+        # A restrição do banco também protege contra dois cadastros simultâneos.
         db.rollback()
         raise ConflitoErro(
             "CATEGORIA_DUPLICADA", "Já existe uma categoria com esse nome."
@@ -29,11 +34,15 @@ def criar_categoria(db: Session, dados: CategoriaCriacao) -> Categoria:
 
 
 def listar_categorias(db: Session, offset: int, limite: int) -> list[Categoria]:
+    """Ordena por ID e aplica ``offset`` e ``limite`` diretamente no banco."""
+
     consulta = select(Categoria).order_by(Categoria.id).offset(offset).limit(limite)
     return list(db.scalars(consulta))
 
 
 def buscar_categoria(db: Session, categoria_id: int) -> Categoria:
+    """Usa a chave primária para buscar a categoria ou gera um erro 404."""
+
     categoria = db.get(Categoria, categoria_id)
     if categoria is None:
         raise RecursoNaoEncontradoErro("Categoria")
@@ -41,6 +50,8 @@ def buscar_categoria(db: Session, categoria_id: int) -> Categoria:
 
 
 def atualizar_categoria(db: Session, categoria_id: int, dados: CategoriaAtualizacao) -> Categoria:
+    """Busca a categoria, impede nome repetido e salva somente a alteração recebida."""
+
     categoria = buscar_categoria(db, categoria_id)
     alteracoes = dados.model_dump(exclude_unset=True)
 
@@ -67,6 +78,8 @@ def atualizar_categoria(db: Session, categoria_id: int, dados: CategoriaAtualiza
 
 
 def excluir_categoria(db: Session, categoria_id: int) -> None:
+    """Consulta produtos vinculados e exclui apenas quando o histórico fica íntegro."""
+
     categoria = buscar_categoria(db, categoria_id)
     produto_vinculado = db.scalar(
         select(Produto.id).where(Produto.categoria_id == categoria_id).limit(1)

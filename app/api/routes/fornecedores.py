@@ -1,3 +1,5 @@
+"""Endpoints de criação, consulta, atualização e exclusão de fornecedores."""
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Response, status
@@ -14,6 +16,7 @@ from app.schemas.fornecedor import (
 from app.services import fornecedores as servico
 
 router = APIRouter(prefix="/fornecedores", tags=["Fornecedores"], responses=RESPOSTAS_COMUNS)
+# Ao encontrar SessaoBanco, o FastAPI chama get_db e injeta a sessão na rota.
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 
@@ -26,6 +29,8 @@ SessaoBanco = Annotated[Session, Depends(get_db)]
     responses=respostas(401, 409),
 )
 def criar(dados: FornecedorCriacao, db: SessaoBanco) -> FornecedorResposta:
+    """Cadastra os dados já normalizados, após conferir CNPJ e e-mail repetidos."""
+
     return servico.criar_fornecedor(db, dados)
 
 
@@ -35,6 +40,8 @@ def listar(
     offset: Annotated[int, Query(ge=0)] = 0,
     limite: Annotated[int, Query(ge=1, le=100)] = 20,
 ) -> list[FornecedorResposta]:
+    """Consulta fornecedores por ordem de ID usando a paginação recebida na URL."""
+
     return servico.listar_fornecedores(db, offset, limite)
 
 
@@ -45,6 +52,8 @@ def listar(
     responses=respostas(404),
 )
 def buscar(fornecedor_id: int, db: SessaoBanco) -> FornecedorResposta:
+    """Chama ``buscar_fornecedor``; o service devolve o registro ou um erro 404."""
+
     return servico.buscar_fornecedor(db, fornecedor_id)
 
 
@@ -58,6 +67,8 @@ def buscar(fornecedor_id: int, db: SessaoBanco) -> FornecedorResposta:
 def atualizar(
     fornecedor_id: int, dados: FornecedorAtualizacao, db: SessaoBanco
 ) -> FornecedorResposta:
+    """Atualiza os campos enviados depois de conferir novo CNPJ e novo e-mail."""
+
     return servico.atualizar_fornecedor(db, fornecedor_id, dados)
 
 
@@ -69,5 +80,7 @@ def atualizar(
     responses=respostas(401, 404, 409),
 )
 def excluir(fornecedor_id: int, db: SessaoBanco) -> Response:
+    """Exclui somente sem produto ou movimentação vinculada e então retorna 204."""
+
     servico.excluir_fornecedor(db, fornecedor_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

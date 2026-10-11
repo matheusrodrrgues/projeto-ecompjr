@@ -1,3 +1,5 @@
+"""Endpoints de registro e consulta do histórico de estoque."""
+
 from datetime import date
 from typing import Annotated
 
@@ -16,6 +18,7 @@ router = APIRouter(
     tags=["Movimentações de estoque"],
     responses=RESPOSTAS_COMUNS,
 )
+# Ao encontrar SessaoBanco, o FastAPI chama get_db e injeta a sessão na rota.
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 
@@ -28,6 +31,8 @@ SessaoBanco = Annotated[Session, Depends(get_db)]
     responses=respostas(401, 404, 409),
 )
 def criar(dados: MovimentacaoCriacao, db: SessaoBanco) -> MovimentacaoResposta:
+    """Registra entrada ou saída e atualiza o saldo na mesma transação do banco."""
+
     return servico.criar_movimentacao(db, dados)
 
 
@@ -47,6 +52,8 @@ def listar(
     produto_id: Annotated[int | None, Query(gt=0)] = None,
     tipo: TipoMovimentacao | None = None,
 ) -> list[MovimentacaoResposta]:
+    """Monta a consulta do histórico com os filtros e a paginação informados."""
+
     return servico.listar_movimentacoes(
         db,
         offset=offset,
@@ -66,4 +73,6 @@ def listar(
     responses=respostas(404),
 )
 def buscar(movimentacao_id: int, db: SessaoBanco) -> MovimentacaoResposta:
+    """Busca uma movimentação pelo ID; esse histórico não possui edição ou exclusão."""
+
     return servico.buscar_movimentacao(db, movimentacao_id)
