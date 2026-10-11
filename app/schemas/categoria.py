@@ -15,11 +15,17 @@ class CategoriaBase(BaseModel):
 
 
 class CategoriaCriacao(CategoriaBase):
-    pass
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={"examples": [{"nome": "Papelaria"}]},
+    )
 
 
 class CategoriaAtualizacao(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={"examples": [{"nome": "Material escolar"}]},
+    )
 
     nome: str | None = Field(default=None, min_length=2, max_length=100)
 

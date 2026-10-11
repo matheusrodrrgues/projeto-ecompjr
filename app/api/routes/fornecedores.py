@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import obter_usuario_atual
+from app.api.documentacao import RESPOSTAS_COMUNS, respostas
 from app.db.session import get_db
 from app.schemas.fornecedor import (
     FornecedorAtualizacao,
@@ -12,7 +13,7 @@ from app.schemas.fornecedor import (
 )
 from app.services import fornecedores as servico
 
-router = APIRouter(prefix="/fornecedores", tags=["Fornecedores"])
+router = APIRouter(prefix="/fornecedores", tags=["Fornecedores"], responses=RESPOSTAS_COMUNS)
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 
@@ -21,12 +22,14 @@ SessaoBanco = Annotated[Session, Depends(get_db)]
     response_model=FornecedorResposta,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(obter_usuario_atual)],
+    summary="Cadastrar fornecedor",
+    responses=respostas(401, 409),
 )
 def criar(dados: FornecedorCriacao, db: SessaoBanco) -> FornecedorResposta:
     return servico.criar_fornecedor(db, dados)
 
 
-@router.get("", response_model=list[FornecedorResposta])
+@router.get("", response_model=list[FornecedorResposta], summary="Listar fornecedores")
 def listar(
     db: SessaoBanco,
     offset: Annotated[int, Query(ge=0)] = 0,
@@ -35,7 +38,12 @@ def listar(
     return servico.listar_fornecedores(db, offset, limite)
 
 
-@router.get("/{fornecedor_id}", response_model=FornecedorResposta)
+@router.get(
+    "/{fornecedor_id}",
+    response_model=FornecedorResposta,
+    summary="Consultar fornecedor",
+    responses=respostas(404),
+)
 def buscar(fornecedor_id: int, db: SessaoBanco) -> FornecedorResposta:
     return servico.buscar_fornecedor(db, fornecedor_id)
 
@@ -44,6 +52,8 @@ def buscar(fornecedor_id: int, db: SessaoBanco) -> FornecedorResposta:
     "/{fornecedor_id}",
     response_model=FornecedorResposta,
     dependencies=[Depends(obter_usuario_atual)],
+    summary="Atualizar fornecedor",
+    responses=respostas(401, 404, 409),
 )
 def atualizar(
     fornecedor_id: int, dados: FornecedorAtualizacao, db: SessaoBanco
@@ -55,6 +65,8 @@ def atualizar(
     "/{fornecedor_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(obter_usuario_atual)],
+    summary="Excluir fornecedor",
+    responses=respostas(401, 404, 409),
 )
 def excluir(fornecedor_id: int, db: SessaoBanco) -> Response:
     servico.excluir_fornecedor(db, fornecedor_id)

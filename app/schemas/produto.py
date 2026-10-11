@@ -27,11 +27,29 @@ class ProdutoBase(BaseModel):
 
 
 class ProdutoCriacao(ProdutoBase):
-    pass
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "nome": "Caderno universitário",
+                    "sku": "CAD-001",
+                    "preco_custo": "10.00",
+                    "preco_venda": "18.00",
+                    "estoque_minimo": 5,
+                    "categoria_id": 1,
+                    "fornecedor_id": 1,
+                }
+            ]
+        },
+    )
 
 
 class ProdutoAtualizacao(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={"examples": [{"preco_venda": "19.90", "estoque_minimo": 8}]},
+    )
 
     nome: str | None = Field(default=None, min_length=2, max_length=150)
     sku: str | None = Field(default=None, min_length=2, max_length=50)

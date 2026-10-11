@@ -6,7 +6,19 @@ from app.models.movimentacao import TipoMovimentacao
 
 
 class MovimentacaoCriacao(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "produto_id": 1,
+                    "tipo": "entrada",
+                    "quantidade": 20,
+                    "observacao": "Compra do fornecedor",
+                }
+            ]
+        },
+    )
 
     produto_id: int = Field(gt=0)
     tipo: TipoMovimentacao

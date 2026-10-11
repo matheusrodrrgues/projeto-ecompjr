@@ -4,7 +4,18 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 class UsuarioCriacao(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "nome": "Matheus Rodrigues",
+                    "email": "matheus@example.com",
+                    "senha": "senha-segura-123",
+                }
+            ]
+        },
+    )
 
     nome: str = Field(min_length=2, max_length=150)
     email: EmailStr

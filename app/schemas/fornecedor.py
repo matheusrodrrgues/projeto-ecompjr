@@ -27,11 +27,28 @@ class FornecedorBase(BaseModel):
 
 
 class FornecedorCriacao(FornecedorBase):
-    pass
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "nome": "Atacado Central",
+                    "cnpj": "12.345.678/0001-90",
+                    "telefone": "75999999999",
+                    "email": "contato@atacadocentral.com.br",
+                }
+            ]
+        },
+    )
 
 
 class FornecedorAtualizacao(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [{"telefone": "7533334444", "email": "novo@atacadocentral.com.br"}]
+        },
+    )
 
     nome: str | None = Field(default=None, min_length=2, max_length=150)
     cnpj: str | None = None

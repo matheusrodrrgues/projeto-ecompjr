@@ -9,7 +9,14 @@ from app.api.router import api_router
 from app.core.config import settings
 from app.core.exceptions import RegraDeNegocioErro
 
-app = FastAPI(title=settings.app_name)
+app = FastAPI(
+    title=settings.app_name,
+    version="1.0.0",
+    description=(
+        "API para cadastro do catálogo e controle das entradas e saídas "
+        "de estoque de uma loja de variedades."
+    ),
+)
 app.include_router(api_router)
 logger = logging.getLogger(__name__)
 
@@ -71,6 +78,10 @@ async def tratar_erro_inesperado(request: Request, erro: Exception) -> JSONRespo
     )
 
 
-@app.get("/health", tags=["Saúde"])
+@app.get(
+    "/health",
+    tags=["Saúde"],
+    summary="Verificar se a API está disponível",
+)
 async def health_check() -> dict[str, str]:
     return {"status": "ok"}

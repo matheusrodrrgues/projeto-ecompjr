@@ -5,12 +5,17 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import obter_usuario_atual
+from app.api.documentacao import RESPOSTAS_COMUNS, respostas
 from app.db.session import get_db
 from app.models.movimentacao import TipoMovimentacao
 from app.schemas.movimentacao import MovimentacaoCriacao, MovimentacaoResposta
 from app.services import movimentacoes as servico
 
-router = APIRouter(prefix="/movimentacoes", tags=["Movimentações de estoque"])
+router = APIRouter(
+    prefix="/movimentacoes",
+    tags=["Movimentações de estoque"],
+    responses=RESPOSTAS_COMUNS,
+)
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 
@@ -19,12 +24,19 @@ SessaoBanco = Annotated[Session, Depends(get_db)]
     response_model=MovimentacaoResposta,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(obter_usuario_atual)],
+    summary="Registrar entrada ou saída",
+    responses=respostas(401, 404, 409),
 )
 def criar(dados: MovimentacaoCriacao, db: SessaoBanco) -> MovimentacaoResposta:
     return servico.criar_movimentacao(db, dados)
 
 
-@router.get("", response_model=list[MovimentacaoResposta])
+@router.get(
+    "",
+    response_model=list[MovimentacaoResposta],
+    summary="Listar e filtrar movimentações",
+    responses=respostas(400),
+)
 def listar(
     db: SessaoBanco,
     offset: Annotated[int, Query(ge=0)] = 0,
@@ -47,6 +59,11 @@ def listar(
     )
 
 
-@router.get("/{movimentacao_id}", response_model=MovimentacaoResposta)
+@router.get(
+    "/{movimentacao_id}",
+    response_model=MovimentacaoResposta,
+    summary="Consultar movimentação",
+    responses=respostas(404),
+)
 def buscar(movimentacao_id: int, db: SessaoBanco) -> MovimentacaoResposta:
     return servico.buscar_movimentacao(db, movimentacao_id)

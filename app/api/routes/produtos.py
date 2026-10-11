@@ -4,11 +4,12 @@ from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import obter_usuario_atual
+from app.api.documentacao import RESPOSTAS_COMUNS, respostas
 from app.db.session import get_db
 from app.schemas.produto import ProdutoAtualizacao, ProdutoCriacao, ProdutoResposta
 from app.services import produtos as servico
 
-router = APIRouter(prefix="/produtos", tags=["Produtos"])
+router = APIRouter(prefix="/produtos", tags=["Produtos"], responses=RESPOSTAS_COMUNS)
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 
@@ -17,12 +18,14 @@ SessaoBanco = Annotated[Session, Depends(get_db)]
     response_model=ProdutoResposta,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(obter_usuario_atual)],
+    summary="Cadastrar produto",
+    responses=respostas(401, 404, 409),
 )
 def criar(dados: ProdutoCriacao, db: SessaoBanco) -> ProdutoResposta:
     return servico.criar_produto(db, dados)
 
 
-@router.get("", response_model=list[ProdutoResposta])
+@router.get("", response_model=list[ProdutoResposta], summary="Listar e filtrar produtos")
 def listar(
     db: SessaoBanco,
     offset: Annotated[int, Query(ge=0)] = 0,
@@ -41,7 +44,11 @@ def listar(
     )
 
 
-@router.get("/estoque-baixo", response_model=list[ProdutoResposta])
+@router.get(
+    "/estoque-baixo",
+    response_model=list[ProdutoResposta],
+    summary="Listar produtos com estoque baixo",
+)
 def listar_estoque_baixo(
     db: SessaoBanco,
     offset: Annotated[int, Query(ge=0)] = 0,
@@ -50,7 +57,12 @@ def listar_estoque_baixo(
     return servico.listar_estoque_baixo(db, offset, limite)
 
 
-@router.get("/{produto_id}", response_model=ProdutoResposta)
+@router.get(
+    "/{produto_id}",
+    response_model=ProdutoResposta,
+    summary="Consultar produto",
+    responses=respostas(404),
+)
 def buscar(produto_id: int, db: SessaoBanco) -> ProdutoResposta:
     return servico.buscar_produto(db, produto_id)
 
@@ -59,6 +71,8 @@ def buscar(produto_id: int, db: SessaoBanco) -> ProdutoResposta:
     "/{produto_id}",
     response_model=ProdutoResposta,
     dependencies=[Depends(obter_usuario_atual)],
+    summary="Atualizar produto",
+    responses=respostas(401, 404, 409),
 )
 def atualizar(produto_id: int, dados: ProdutoAtualizacao, db: SessaoBanco) -> ProdutoResposta:
     return servico.atualizar_produto(db, produto_id, dados)
@@ -68,6 +82,8 @@ def atualizar(produto_id: int, dados: ProdutoAtualizacao, db: SessaoBanco) -> Pr
     "/{produto_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(obter_usuario_atual)],
+    summary="Excluir produto",
+    responses=respostas(401, 404, 409),
 )
 def excluir(produto_id: int, db: SessaoBanco) -> Response:
     servico.excluir_produto(db, produto_id)
