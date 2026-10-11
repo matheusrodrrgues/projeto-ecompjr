@@ -1,5 +1,3 @@
-from datetime import date
-
 import pytest
 from httpx import AsyncClient
 
@@ -70,7 +68,7 @@ async def test_saida_sem_estoque_nao_e_registrada(client: AsyncClient) -> None:
 @pytest.mark.anyio
 async def test_lista_movimentacoes_com_filtros(client: AsyncClient) -> None:
     produto_id, fornecedor_id = await criar_produto(client)
-    await client.post(
+    movimentacao = await client.post(
         "/api/v1/movimentacoes",
         json={
             "produto_id": produto_id,
@@ -79,12 +77,13 @@ async def test_lista_movimentacoes_com_filtros(client: AsyncClient) -> None:
             "observacao": "  compra inicial  ",
         },
     )
+    data_movimentacao = movimentacao.json()["data"][:10]
 
     resposta = await client.get(
         "/api/v1/movimentacoes",
         params={
-            "data_inicio": date.today().isoformat(),
-            "data_fim": date.today().isoformat(),
+            "data_inicio": data_movimentacao,
+            "data_fim": data_movimentacao,
             "fornecedor_id": fornecedor_id,
             "produto_id": produto_id,
             "tipo": "entrada",

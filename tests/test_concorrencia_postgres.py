@@ -29,7 +29,8 @@ def banco_postgres() -> sessionmaker[Session]:
     with engine.begin() as conexao:
         conexao.execute(
             text(
-                "TRUNCATE TABLE movimentacoes_estoque, produtos, fornecedores, categorias "
+                "TRUNCATE TABLE movimentacoes_estoque, produtos, fornecedores, categorias, "
+                "usuarios "
                 "RESTART IDENTITY CASCADE"
             )
         )

@@ -19,6 +19,7 @@ async def tratar_erro_de_negocio(request: Request, erro: RegraDeNegocioErro) -> 
     return JSONResponse(
         status_code=erro.status_code,
         content={"erro": {"codigo": erro.codigo, "mensagem": erro.mensagem}},
+        headers=erro.headers,
     )
 
 

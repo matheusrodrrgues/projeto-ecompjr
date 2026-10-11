@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
+from app.api.dependencies import obter_usuario_atual
 from app.db.session import get_db
 from app.schemas.produto import ProdutoAtualizacao, ProdutoCriacao, ProdutoResposta
 from app.services import produtos as servico
@@ -11,7 +12,12 @@ router = APIRouter(prefix="/produtos", tags=["Produtos"])
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 
-@router.post("", response_model=ProdutoResposta, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=ProdutoResposta,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(obter_usuario_atual)],
+)
 def criar(dados: ProdutoCriacao, db: SessaoBanco) -> ProdutoResposta:
     return servico.criar_produto(db, dados)
 
@@ -49,12 +55,20 @@ def buscar(produto_id: int, db: SessaoBanco) -> ProdutoResposta:
     return servico.buscar_produto(db, produto_id)
 
 
-@router.patch("/{produto_id}", response_model=ProdutoResposta)
+@router.patch(
+    "/{produto_id}",
+    response_model=ProdutoResposta,
+    dependencies=[Depends(obter_usuario_atual)],
+)
 def atualizar(produto_id: int, dados: ProdutoAtualizacao, db: SessaoBanco) -> ProdutoResposta:
     return servico.atualizar_produto(db, produto_id, dados)
 
 
-@router.delete("/{produto_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{produto_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(obter_usuario_atual)],
+)
 def excluir(produto_id: int, db: SessaoBanco) -> Response:
     servico.excluir_produto(db, produto_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

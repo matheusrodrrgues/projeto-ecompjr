@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
+from app.api.dependencies import obter_usuario_atual
 from app.db.session import get_db
 from app.models.movimentacao import TipoMovimentacao
 from app.schemas.movimentacao import MovimentacaoCriacao, MovimentacaoResposta
@@ -13,7 +14,12 @@ router = APIRouter(prefix="/movimentacoes", tags=["Movimentações de estoque"])
 SessaoBanco = Annotated[Session, Depends(get_db)]
 
 
-@router.post("", response_model=MovimentacaoResposta, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=MovimentacaoResposta,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(obter_usuario_atual)],
+)
 def criar(dados: MovimentacaoCriacao, db: SessaoBanco) -> MovimentacaoResposta:
     return servico.criar_movimentacao(db, dados)
 

@@ -27,6 +27,7 @@ jobs:
     env:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/ecomp_stock_test
       TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/ecomp_stock_test
+      JWT_SECRET: chave-de-teste-do-workflow-com-mais-de-32-caracteres
 
     steps:
       - uses: actions/checkout@v7

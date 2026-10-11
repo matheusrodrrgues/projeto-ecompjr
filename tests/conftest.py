@@ -39,7 +39,7 @@ def anyio_backend() -> str:
 
 
 @pytest.fixture
-async def client(db: Session) -> AsyncIterator[AsyncClient]:
+async def client_sem_auth(db: Session) -> AsyncIterator[AsyncClient]:
     def sobrescrever_banco():
         yield db
 
@@ -48,3 +48,25 @@ async def client(db: Session) -> AsyncIterator[AsyncClient]:
     async with AsyncClient(transport=transport, base_url="http://test") as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+async def client(client_sem_auth: AsyncClient) -> AsyncIterator[AsyncClient]:
+    senha = "senha-segura-123"
+    cadastro = await client_sem_auth.post(
+        "/api/v1/auth/cadastro",
+        json={
+            "nome": "Usuário de Teste",
+            "email": "teste@ecomp.com",
+            "senha": senha,
+        },
+    )
+    assert cadastro.status_code == 201
+
+    login = await client_sem_auth.post(
+        "/api/v1/auth/login",
+        data={"username": "teste@ecomp.com", "password": senha},
+    )
+    assert login.status_code == 200
+    client_sem_auth.headers["Authorization"] = f"Bearer {login.json()['access_token']}"
+    yield client_sem_auth
