@@ -4,7 +4,7 @@ from app.main import app
 def test_openapi_tem_informacoes_e_exemplos() -> None:
     openapi = app.openapi()
 
-    assert openapi["info"]["title"] == "Ecomp Stock API"
+    assert openapi["info"]["title"] == "jrEstoqueAPI"
     assert openapi["info"]["version"] == "1.0.0"
     assert openapi["components"]["schemas"]["ProdutoCriacao"]["examples"]
     assert openapi["components"]["schemas"]["MovimentacaoCriacao"]["examples"]

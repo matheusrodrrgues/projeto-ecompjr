@@ -1,4 +1,4 @@
-# Ecomp Stock API
+# jrEstoqueAPI
 
 API para controlar produtos, fornecedores, categorias e entradas e saídas de estoque de uma loja de variedades.
 

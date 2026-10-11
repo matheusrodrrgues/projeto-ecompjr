@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "Ecomp Stock API"
+    app_name: str = "jrEstoqueAPI"
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/ecomp_stock"
     jwt_secret: str = Field(min_length=32)
     jwt_expiracao_minutos: int = Field(default=60, gt=0)
