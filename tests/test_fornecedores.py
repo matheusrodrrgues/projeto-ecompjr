@@ -21,10 +21,14 @@ async def test_crud_de_fornecedor(client: AsyncClient) -> None:
 
     atualizacao = await client.patch(
         f"/api/v1/fornecedores/{fornecedor_id}",
-        json={"telefone": "7533334444"},
+        json={
+            "telefone": "7533334444",
+            "email": "Novo@DistribuidoraFeira.com.br",
+        },
     )
     assert atualizacao.status_code == 200
     assert atualizacao.json()["telefone"] == "7533334444"
+    assert atualizacao.json()["email"] == "novo@distribuidorafeira.com.br"
 
     exclusao = await client.delete(f"/api/v1/fornecedores/{fornecedor_id}")
     assert exclusao.status_code == 204
@@ -47,6 +51,31 @@ async def test_valida_formato_do_cnpj(client: AsyncClient) -> None:
 
     assert resposta.status_code == 422
     assert resposta.json()["erro"]["codigo"] == "DADOS_INVALIDOS"
+
+
+@pytest.mark.anyio
+async def test_rejeita_cnpj_enviado_com_tipo_invalido(client: AsyncClient) -> None:
+    dados = {**DADOS_FORNECEDOR, "cnpj": 12345678000190}
+    resposta = await client.post("/api/v1/fornecedores", json=dados)
+
+    assert resposta.status_code == 422
+    assert resposta.json()["erro"]["codigo"] == "DADOS_INVALIDOS"
+
+
+@pytest.mark.anyio
+async def test_email_duplicado_ignora_maiusculas_e_minusculas(client: AsyncClient) -> None:
+    primeiro = {**DADOS_FORNECEDOR, "email": "Contato@DistribuidoraFeira.com.br"}
+    await client.post("/api/v1/fornecedores", json=primeiro)
+
+    duplicado = {
+        **DADOS_FORNECEDOR,
+        "cnpj": "98.765.432/0001-10",
+        "email": "contato@distribuidorafeira.com.br",
+    }
+    resposta = await client.post("/api/v1/fornecedores", json=duplicado)
+
+    assert resposta.status_code == 409
+    assert resposta.json()["erro"]["codigo"] == "EMAIL_DUPLICADO"
 
 
 @pytest.mark.anyio

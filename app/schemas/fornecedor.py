@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
+from pydantic_core import PydanticCustomError
 
 
 class FornecedorBase(BaseModel):
@@ -24,10 +25,18 @@ class FornecedorBase(BaseModel):
     @classmethod
     def normalizar_cnpj(cls, cnpj: str) -> str:
         """Aceita CNPJ com máscara e guarda somente seus 14 números."""
+        if not isinstance(cnpj, str):
+            raise PydanticCustomError("string_type", "O CNPJ deve ser informado como texto.")
         apenas_numeros = re.sub(r"\D", "", cnpj)
         if len(apenas_numeros) != 14:
             raise ValueError("O CNPJ deve ter 14 dígitos.")
         return apenas_numeros
+
+    @field_validator("email")
+    @classmethod
+    def normalizar_email(cls, email: EmailStr) -> str:
+        """Padroniza o e-mail para que a unicidade não dependa de maiúsculas."""
+        return str(email).lower()
 
 
 class FornecedorCriacao(FornecedorBase):
@@ -71,10 +80,18 @@ class FornecedorAtualizacao(BaseModel):
         """Aplica ao novo CNPJ a mesma normalização usada no cadastro."""
         if cnpj is None:
             return None
+        if not isinstance(cnpj, str):
+            raise PydanticCustomError("string_type", "O CNPJ deve ser informado como texto.")
         apenas_numeros = re.sub(r"\D", "", cnpj)
         if len(apenas_numeros) != 14:
             raise ValueError("O CNPJ deve ter 14 dígitos.")
         return apenas_numeros
+
+    @field_validator("email")
+    @classmethod
+    def normalizar_email(cls, email: EmailStr | None) -> str | None:
+        """Normaliza o novo e-mail antes da verificação de duplicidade."""
+        return str(email).lower() if email is not None else None
 
     @model_validator(mode="after")
     def validar_alteracoes(self) -> "FornecedorAtualizacao":
