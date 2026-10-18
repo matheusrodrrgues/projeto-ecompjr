@@ -1,3 +1,4 @@
+import logging
 from datetime import UTC, date, datetime, time
 
 from sqlalchemy import select
@@ -8,6 +9,8 @@ from app.models.movimentacao import MovimentacaoEstoque, TipoMovimentacao
 from app.models.produto import Produto
 from app.schemas.movimentacao import MovimentacaoCriacao
 
+logger = logging.getLogger(__name__)
+
 
 def criar_movimentacao(db: Session, dados: MovimentacaoCriacao) -> MovimentacaoEstoque:
     try:
@@ -17,6 +20,12 @@ def criar_movimentacao(db: Session, dados: MovimentacaoCriacao) -> MovimentacaoE
             raise RecursoNaoEncontradoErro("Produto")
 
         if dados.tipo == TipoMovimentacao.SAIDA and produto.quantidade_estoque < dados.quantidade:
+            logger.warning(
+                "estoque_insuficiente produto_id=%s saldo=%s quantidade_solicitada=%s",
+                produto.id,
+                produto.quantidade_estoque,
+                dados.quantidade,
+            )
             raise ConflitoErro(
                 "ESTOQUE_INSUFICIENTE",
                 "O produto não possui estoque suficiente para essa saída.",
@@ -38,6 +47,14 @@ def criar_movimentacao(db: Session, dados: MovimentacaoCriacao) -> MovimentacaoE
         db.add(movimentacao)
         db.commit()
         db.refresh(movimentacao)
+        logger.info(
+            "movimentacao_criada id=%s produto_id=%s tipo=%s quantidade=%s saldo=%s",
+            movimentacao.id,
+            produto.id,
+            dados.tipo.value,
+            dados.quantidade,
+            produto.quantidade_estoque,
+        )
         return movimentacao
     except Exception:
         db.rollback()

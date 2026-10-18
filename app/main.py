@@ -8,6 +8,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.api.router import api_router
 from app.core.config import settings
 from app.core.exceptions import RegraDeNegocioErro
+from app.core.logs import configurar_logs
+
+configurar_logs()
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=settings.app_name,
@@ -18,7 +22,6 @@ app = FastAPI(
     ),
 )
 app.include_router(api_router)
-logger = logging.getLogger(__name__)
 
 
 @app.exception_handler(RegraDeNegocioErro)
@@ -66,7 +69,12 @@ async def tratar_erro_http(request: Request, erro: StarletteHTTPException) -> JS
 
 @app.exception_handler(Exception)
 async def tratar_erro_inesperado(request: Request, erro: Exception) -> JSONResponse:
-    logger.exception("Erro inesperado durante a requisição", exc_info=erro)
+    logger.exception(
+        "erro_inesperado metodo=%s caminho=%s",
+        request.method,
+        request.url.path,
+        exc_info=erro,
+    )
     return JSONResponse(
         status_code=500,
         content={

@@ -29,7 +29,10 @@ async def criar_produto(client: AsyncClient) -> tuple[int, int]:
 
 
 @pytest.mark.anyio
-async def test_entrada_e_saida_atualizam_estoque(client: AsyncClient) -> None:
+async def test_entrada_e_saida_atualizam_estoque(
+    client: AsyncClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level("INFO", logger="app.services.movimentacoes")
     produto_id, fornecedor_id = await criar_produto(client)
 
     entrada = await client.post(
@@ -46,10 +49,16 @@ async def test_entrada_e_saida_atualizam_estoque(client: AsyncClient) -> None:
     assert entrada.json()["fornecedor_id"] == fornecedor_id
     assert saida.status_code == 201
     assert produto.json()["quantidade_estoque"] == 6
+    assert (
+        sum(registro.message.startswith("movimentacao_criada") for registro in caplog.records) == 2
+    )
 
 
 @pytest.mark.anyio
-async def test_saida_sem_estoque_nao_e_registrada(client: AsyncClient) -> None:
+async def test_saida_sem_estoque_nao_e_registrada(
+    client: AsyncClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level("WARNING", logger="app.services.movimentacoes")
     produto_id, _ = await criar_produto(client)
 
     resposta = await client.post(
@@ -63,6 +72,7 @@ async def test_saida_sem_estoque_nao_e_registrada(client: AsyncClient) -> None:
     assert resposta.json()["erro"]["codigo"] == "ESTOQUE_INSUFICIENTE"
     assert produto.json()["quantidade_estoque"] == 0
     assert movimentacoes.json() == []
+    assert any(registro.message.startswith("estoque_insuficiente") for registro in caplog.records)
 
 
 @pytest.mark.anyio

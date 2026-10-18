@@ -37,7 +37,10 @@ async def test_nao_permite_email_duplicado(client_sem_auth: AsyncClient) -> None
 
 
 @pytest.mark.anyio
-async def test_rejeita_login_invalido(client_sem_auth: AsyncClient) -> None:
+async def test_rejeita_login_invalido(
+    client_sem_auth: AsyncClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level("WARNING", logger="app.services.autenticacao")
     await client_sem_auth.post("/api/v1/auth/cadastro", json=DADOS_USUARIO)
     resposta = await client_sem_auth.post(
         "/api/v1/auth/login",
@@ -47,6 +50,7 @@ async def test_rejeita_login_invalido(client_sem_auth: AsyncClient) -> None:
     assert resposta.status_code == 401
     assert resposta.json()["erro"]["codigo"] == "NAO_AUTORIZADO"
     assert resposta.headers["www-authenticate"] == "Bearer"
+    assert any(registro.message == "login_recusado" for registro in caplog.records)
 
 
 @pytest.mark.anyio

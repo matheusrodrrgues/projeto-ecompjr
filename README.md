@@ -17,6 +17,7 @@ movimentações.
 - filtros de movimentações por período, produto, fornecedor e tipo;
 - autenticação para as operações que alteram dados;
 - respostas de erro padronizadas;
+- logs de autenticação, movimentações e erros inesperados;
 - documentação interativa com Swagger.
 
 ## Tecnologias
@@ -109,6 +110,12 @@ Authorization: Bearer SEU_TOKEN
 ```
 
 As senhas não são armazenadas diretamente. Antes de chegar ao banco, elas passam pelo Argon2.
+
+## Logs
+
+A aplicação usa o módulo `logging` do Python com data, nível, módulo e evento. São registrados os
+cadastros e logins de usuários, as movimentações, as tentativas de saída sem saldo e os erros
+inesperados. Senhas e tokens não são incluídos nos logs.
 
 ## Regras principais
 
