@@ -202,22 +202,13 @@ O `.env.example` possui os valores necessários para o ambiente local. Em outro 
 
 ## Uso de IA
 
-Usei IA como ferramenta de apoio durante o desenvolvimento. Ela me ajudou principalmente a
-organizar a estrutura inicial do projeto, tirar dúvidas sobre FastAPI e SQLAlchemy, revisar
-validações e pensar em cenários de teste que eu poderia ter deixado passar.
+Usei IA para tirar dúvidas e revisar algumas partes do projeto, principalmente a organização das
+pastas, as validações e os testes. Também consultei sugestões sobre autenticação com JWT e o
+controle de concorrência nas movimentações.
 
-Aproveitei a sugestão de separar o projeto em rotas, schemas, models e services, porque isso deixou
-as responsabilidades mais claras. Também usei como referência algumas sugestões para autenticação
-com JWT, migrations e controle de concorrência nas movimentações.
-
-Nem tudo foi mantido como foi sugerido. Ajustei os nomes para português, reescrevi mensagens de
-erro, simplifiquei comentários e adaptei as validações às regras do desafio. Também revisei a
-atualização do estoque para garantir que o saldo e a movimentação fossem salvos na mesma transação,
-além de manter o fornecedor registrado no histórico.
-
-No final, conferi o funcionamento pelo Swagger, executei o fluxo de cadastro e movimentação
-manualmente e rodei os testes automatizados. Mantive no projeto apenas as partes que revisei e que
-consigo explicar.
+Algumas respostas vieram mais complexas ou com comentários demais, então simplifiquei o código,
+mudei nomes e mensagens e adaptei as regras ao desafio. Depois conferi o funcionamento pelo Swagger
+e rodei os testes automatizados.
 
 ## Autor
 
