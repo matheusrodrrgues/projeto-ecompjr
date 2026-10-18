@@ -48,16 +48,11 @@ Copy-Item .env.example .env
 Depois, suba a API e o banco:
 
 ```bash
-docker compose up --build -d
+docker compose up --build
 ```
 
-Com os containers em execução, aplique as migrations:
-
-```bash
-docker compose exec api alembic upgrade head
-```
-
-A documentação estará disponível em:
+As migrations são aplicadas automaticamente antes de a API iniciar. Quando o terminal indicar que
+o servidor está disponível, abra a documentação no navegador:
 
 ```text
 http://localhost:8000/docs
@@ -154,19 +149,29 @@ de negócio usando os models.
 
 ## Testes
 
-Para executar os testes fora do Docker, crie um ambiente virtual e instale as dependências de
-desenvolvimento:
+Para executar os testes fora do Docker, primeiro crie um ambiente virtual:
 
 ```bash
 python -m venv .venv
-pip install -e ".[dev]"
-pytest -q
 ```
 
-No PowerShell, o ambiente virtual pode ser ativado com:
+Ative o ambiente no PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
+```
+
+No Linux ou macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Depois, instale as dependências de desenvolvimento e rode os testes:
+
+```bash
+pip install -e ".[dev]"
+pytest -q
 ```
 
 Os testes verificam autenticação, validações, filtros, regras de estoque e respostas de erro. Há
