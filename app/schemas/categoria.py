@@ -1,5 +1,3 @@
-"""Validação dos dados de entrada e saída de categorias."""
-
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -13,7 +11,6 @@ class CategoriaBase(BaseModel):
     @field_validator("nome", mode="before")
     @classmethod
     def limpar_nome(cls, nome: str) -> str:
-        """Remove espaços das pontas antes de o Pydantic validar o tamanho."""
         return nome.strip() if isinstance(nome, str) else nome
 
 
@@ -35,12 +32,10 @@ class CategoriaAtualizacao(BaseModel):
     @field_validator("nome", mode="before")
     @classmethod
     def limpar_nome(cls, nome: str | None) -> str | None:
-        """Limpa o nome enviado sem alterar campos que não vieram na requisição."""
         return nome.strip() if isinstance(nome, str) else nome
 
     @model_validator(mode="after")
     def validar_alteracao(self) -> "CategoriaAtualizacao":
-        """Impede PATCH vazio ou com nome nulo, pois não haveria o que atualizar."""
         if "nome" not in self.model_fields_set or self.nome is None:
             raise ValueError("Informe o nome que deseja atualizar.")
         return self

@@ -1,9 +1,4 @@
-"""Exceções de negócio transformadas em respostas HTTP pelo main.py."""
-
-
 class RegraDeNegocioErro(Exception):
-    """Erro conhecido, com código e mensagem seguros para o cliente."""
-
     def __init__(
         self,
         codigo: str,

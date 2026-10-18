@@ -137,7 +137,7 @@ ecomp-stock-api/
 │   ├── schemas/       # validação dos dados
 │   ├── services/      # regras de negócio
 │   └── main.py        # criação da aplicação
-├── docs/              # imagem do Swagger e apoio para a defesa
+├── docs/              # imagens usadas na documentação
 ├── tests/             # testes automatizados
 ├── docker-compose.yml
 ├── Dockerfile
@@ -195,12 +195,10 @@ O `.env.example` possui os valores necessários para o ambiente local. Em outro 
 
 ## Uso de IA
 
-Usei IA como apoio na organização inicial do projeto, na revisão do código e na criação de alguns
-testes. As sugestões foram revisadas e adaptadas durante o desenvolvimento, principalmente nas
-validações, nos comentários e na separação das regras entre rotas e services.
-
-Também mantive em [docs/DEFESA.md](docs/DEFESA.md) um resumo das decisões e regras que preciso
-explicar na apresentação.
+Usei IA em algumas etapas do desenvolvimento, principalmente para organizar a estrutura inicial,
+revisar validações e pensar em casos de teste. Mantive a separação entre rotas, schemas e services,
+mas ajustei nomes, mensagens de erro e regras para o contexto do desafio. Também refiz comentários
+que estavam exagerados e validei o resultado pelos testes e pelo Swagger.
 
 ## Autor
 

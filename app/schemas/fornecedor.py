@@ -1,5 +1,3 @@
-"""Validação e normalização dos dados de fornecedores."""
-
 import re
 from datetime import datetime
 
@@ -18,13 +16,11 @@ class FornecedorBase(BaseModel):
     @field_validator("nome", "telefone", mode="before")
     @classmethod
     def limpar_texto(cls, valor: str) -> str:
-        """Remove espaços extras antes das validações de tamanho dos campos."""
         return valor.strip() if isinstance(valor, str) else valor
 
     @field_validator("cnpj", mode="before")
     @classmethod
     def normalizar_cnpj(cls, cnpj: str) -> str:
-        """Aceita CNPJ com máscara e guarda somente seus 14 números."""
         if not isinstance(cnpj, str):
             raise PydanticCustomError("string_type", "O CNPJ deve ser informado como texto.")
         apenas_numeros = re.sub(r"\D", "", cnpj)
@@ -35,7 +31,6 @@ class FornecedorBase(BaseModel):
     @field_validator("email")
     @classmethod
     def normalizar_email(cls, email: EmailStr) -> str:
-        """Padroniza o e-mail para que a unicidade não dependa de maiúsculas."""
         return str(email).lower()
 
 
@@ -71,13 +66,11 @@ class FornecedorAtualizacao(BaseModel):
     @field_validator("nome", "telefone", mode="before")
     @classmethod
     def limpar_texto(cls, valor: str | None) -> str | None:
-        """Limpa somente os textos presentes no corpo da atualização."""
         return valor.strip() if isinstance(valor, str) else valor
 
     @field_validator("cnpj", mode="before")
     @classmethod
     def normalizar_cnpj(cls, cnpj: str | None) -> str | None:
-        """Aplica ao novo CNPJ a mesma normalização usada no cadastro."""
         if cnpj is None:
             return None
         if not isinstance(cnpj, str):
@@ -90,12 +83,10 @@ class FornecedorAtualizacao(BaseModel):
     @field_validator("email")
     @classmethod
     def normalizar_email(cls, email: EmailStr | None) -> str | None:
-        """Normaliza o novo e-mail antes da verificação de duplicidade."""
         return str(email).lower() if email is not None else None
 
     @model_validator(mode="after")
     def validar_alteracoes(self) -> "FornecedorAtualizacao":
-        """Exige ao menos uma alteração e rejeita campos enviados como nulos."""
         if not self.model_fields_set:
             raise ValueError("Informe ao menos um campo para atualizar.")
         if any(getattr(self, campo) is None for campo in self.model_fields_set):

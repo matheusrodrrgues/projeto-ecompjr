@@ -1,5 +1,3 @@
-"""Tabela de usuários que podem alterar os dados da API."""
-
 from datetime import datetime
 
 from sqlalchemy import DateTime, String, func
@@ -9,8 +7,6 @@ from app.db.base import Base
 
 
 class Usuario(Base):
-    """Usuário autenticado por e-mail e senha armazenada como hash."""
-
     __tablename__ = "usuarios"
 
     id: Mapped[int] = mapped_column(primary_key=True)

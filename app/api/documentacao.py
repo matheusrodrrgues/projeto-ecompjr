@@ -1,5 +1,3 @@
-"""Exemplos de erro reutilizados na documentação OpenAPI."""
-
 from typing import Any
 
 ERROS: dict[int, dict[str, Any]] = {

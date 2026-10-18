@@ -1,5 +1,3 @@
-"""Tabela que registra o histórico imutável do estoque."""
-
 from __future__ import annotations
 
 from datetime import datetime
@@ -23,8 +21,6 @@ class TipoMovimentacao(str, Enum):
 
 
 class MovimentacaoEstoque(Base):
-    """Entrada ou saída associada ao produto e ao fornecedor daquele momento."""
-
     __tablename__ = "movimentacoes_estoque"
     __table_args__ = (
         CheckConstraint("quantidade > 0", name="ck_movimentacao_quantidade_positiva"),

@@ -1,5 +1,3 @@
-"""Importa os models para que SQLAlchemy e Alembic conheçam todas as tabelas."""
-
 from app.models.categoria import Categoria
 from app.models.fornecedor import Fornecedor
 from app.models.movimentacao import MovimentacaoEstoque, TipoMovimentacao

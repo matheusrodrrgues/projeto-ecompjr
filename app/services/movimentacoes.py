@@ -1,5 +1,3 @@
-"""Registro e consulta do histórico de entradas e saídas."""
-
 from datetime import UTC, date, datetime, time
 
 from sqlalchemy import select
@@ -12,14 +10,8 @@ from app.schemas.movimentacao import MovimentacaoCriacao
 
 
 def criar_movimentacao(db: Session, dados: MovimentacaoCriacao) -> MovimentacaoEstoque:
-    """Bloqueia o produto, calcula o saldo e grava a movimentação.
-
-    O saldo e o histórico usam o mesmo commit. Se qualquer etapa falhar, o
-    ``except`` executa rollback para não deixar uma alteração pela metade.
-    """
-
     try:
-        # O bloqueio impede duas saídas simultâneas de usarem o mesmo saldo.
+        # Mantém o saldo bloqueado até terminar a movimentação.
         produto = db.scalar(select(Produto).where(Produto.id == dados.produto_id).with_for_update())
         if produto is None:
             raise RecursoNaoEncontradoErro("Produto")
@@ -35,7 +27,7 @@ def criar_movimentacao(db: Session, dados: MovimentacaoCriacao) -> MovimentacaoE
         else:
             produto.quantidade_estoque -= dados.quantidade
 
-        # O fornecedor é copiado para o histórico para não mudar junto com o produto.
+        # Guardamos o fornecedor usado no momento da movimentação.
         movimentacao = MovimentacaoEstoque(
             produto_id=produto.id,
             fornecedor_id=produto.fornecedor_id,
@@ -62,12 +54,6 @@ def listar_movimentacoes(
     produto_id: int | None = None,
     tipo: TipoMovimentacao | None = None,
 ) -> list[MovimentacaoEstoque]:
-    """Monta uma consulta SQLAlchemy acrescentando somente os filtros recebidos.
-
-    As datas são convertidas para o início e o fim do dia em UTC. No final,
-    a consulta é ordenada da movimentação mais recente para a mais antiga.
-    """
-
     if data_inicio and data_fim and data_inicio > data_fim:
         raise RegraDeNegocioErro(
             "PERIODO_INVALIDO",
@@ -97,8 +83,6 @@ def listar_movimentacoes(
 
 
 def buscar_movimentacao(db: Session, movimentacao_id: int) -> MovimentacaoEstoque:
-    """Usa a chave primária para buscar o registro ou gera um erro 404."""
-
     movimentacao = db.get(MovimentacaoEstoque, movimentacao_id)
     if movimentacao is None:
         raise RecursoNaoEncontradoErro("Movimentação")

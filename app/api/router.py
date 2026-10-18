@@ -1,5 +1,3 @@
-"""Agrupa todas as rotas que usam o prefixo /api/v1."""
-
 from fastapi import APIRouter
 
 from app.api.routes import autenticacao, categorias, fornecedores, movimentacoes, produtos

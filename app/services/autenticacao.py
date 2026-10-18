@@ -1,5 +1,3 @@
-"""Cadastro de usuários e validação de credenciais."""
-
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -11,11 +9,6 @@ from app.schemas.usuario import UsuarioCriacao
 
 
 def criar_usuario(db: Session, dados: UsuarioCriacao) -> Usuario:
-    """Confere o e-mail, chama o gerador de hash e salva o novo usuário.
-
-    O retorno é o model já atualizado pelo banco, sem incluir a senha recebida.
-    """
-
     existente = db.scalar(select(Usuario).where(Usuario.email == str(dados.email)))
     if existente is not None:
         raise ConflitoErro("EMAIL_DUPLICADO", "Já existe um usuário com esse e-mail.")
@@ -37,11 +30,6 @@ def criar_usuario(db: Session, dados: UsuarioCriacao) -> Usuario:
 
 
 def autenticar(db: Session, email: str, senha: str) -> str:
-    """Busca o usuário pelo e-mail e compara a senha por meio do pwdlib.
-
-    Quando a comparação passa, chama ``criar_token`` e devolve o JWT à rota.
-    """
-
     usuario = db.scalar(select(Usuario).where(Usuario.email == email.strip().lower()))
     if usuario is None or not verificar_senha(senha, usuario.senha_hash):
         raise NaoAutorizadoErro("E-mail ou senha inválidos.")

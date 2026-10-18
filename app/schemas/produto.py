@@ -1,5 +1,3 @@
-"""Validação dos dados usados no cadastro de produtos."""
-
 from datetime import datetime
 from decimal import Decimal
 
@@ -20,13 +18,11 @@ class ProdutoBase(BaseModel):
     @field_validator("nome", "sku", mode="before")
     @classmethod
     def limpar_texto(cls, valor: str) -> str:
-        """Remove espaços das pontas antes de validar nome e SKU."""
         return valor.strip() if isinstance(valor, str) else valor
 
     @field_validator("sku")
     @classmethod
     def padronizar_sku(cls, sku: str) -> str:
-        """Converte o SKU para maiúsculas para evitar duplicidade por capitalização."""
         return sku.upper()
 
 
@@ -66,18 +62,15 @@ class ProdutoAtualizacao(BaseModel):
     @field_validator("nome", "sku", mode="before")
     @classmethod
     def limpar_texto(cls, valor: str | None) -> str | None:
-        """Limpa os textos recebidos sem preencher campos ausentes no PATCH."""
         return valor.strip() if isinstance(valor, str) else valor
 
     @field_validator("sku")
     @classmethod
     def padronizar_sku(cls, sku: str | None) -> str | None:
-        """Mantém o padrão em maiúsculas quando um novo SKU é informado."""
         return sku.upper() if sku is not None else None
 
     @model_validator(mode="after")
     def validar_alteracoes(self) -> "ProdutoAtualizacao":
-        """Rejeita atualizações vazias e campos explicitamente enviados como nulos."""
         if not self.model_fields_set:
             raise ValueError("Informe ao menos um campo para atualizar.")
         if any(getattr(self, campo) is None for campo in self.model_fields_set):

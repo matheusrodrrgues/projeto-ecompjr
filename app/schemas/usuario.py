@@ -1,5 +1,3 @@
-"""Dados aceitos no cadastro e devolvidos na autenticação."""
-
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
@@ -26,13 +24,11 @@ class UsuarioCriacao(BaseModel):
     @field_validator("nome", mode="before")
     @classmethod
     def limpar_nome(cls, nome: str) -> str:
-        """Remove espaços das pontas antes de validar o tamanho do nome."""
         return nome.strip() if isinstance(nome, str) else nome
 
     @field_validator("email")
     @classmethod
     def normalizar_email(cls, email: EmailStr) -> str:
-        """Salva o e-mail em minúsculas para a comparação de login e unicidade."""
         return str(email).lower()
 
 

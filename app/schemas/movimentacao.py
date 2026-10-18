@@ -1,5 +1,3 @@
-"""Validação das entradas e saídas registradas no estoque."""
-
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -30,7 +28,6 @@ class MovimentacaoCriacao(BaseModel):
     @field_validator("observacao", mode="before")
     @classmethod
     def limpar_observacao(cls, observacao: str | None) -> str | None:
-        """Remove espaços e transforma uma observação vazia em ausência de valor."""
         if observacao is None:
             return None
         if not isinstance(observacao, str):
